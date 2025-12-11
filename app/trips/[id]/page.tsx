@@ -3,11 +3,19 @@ import Image from 'next/image';
 import { TripService } from '@/lib/services';
 import { formatPrice, formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
+import { mockTrips } from '@/lib/data/mockData';
 
 interface TripPageProps {
   params: {
     id: string;
   };
+}
+
+// Generate static params for all trip IDs
+export async function generateStaticParams() {
+  return mockTrips.map((trip) => ({
+    id: trip.id,
+  }));
 }
 
 export default async function TripPage({ params }: TripPageProps) {
