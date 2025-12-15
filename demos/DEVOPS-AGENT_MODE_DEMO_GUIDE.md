@@ -34,7 +34,7 @@ Create an Azure DevOps multi-stage YAML pipeline for this Node.js app that:
 - Follows Azure naming rules, derives from the repo name and Chooses sensible environment-specific names NOW and writes them into the YAML for:
   • App Service (web app) names for DEV, PREPROD, PROD
   • Resource groups for DEV, PREPROD, PROD
-- Publishes build output using the simplest and most reliable approach for multi-stage deployment (deploy from folder) and update the pipeline accordingly
+- Publishes build output using the simplest and most reliable approach for multi-stage deployment and update the pipeline accordingly
 - Configures manual approval before the PROD stage via Azure DevOps Environments.
 Save the pipeline as `azure-pipelines.yml` at the repo root and show the FULL YAML with the names you selected.
 
