@@ -1,12 +1,14 @@
 
 # DEVOPS - AGENT MODE DEMO
 
-We have a sample web app in "https://github.com/boq-ghcp-demos/travel-agent-demo-app" and want to do a simple deployment to Azure App Service.
+We have a sample web app at "https://github.com/boq-ghcp-demos/travel-agent-demo-app" and want to do a simple deployment to Azure App Service.
 
+**Note:** Make sure you have got enough quota in this region. Alternatively choose the region where you have required quota.
+ 
 ## PART 1 - Provisioning the infrastructure for DEV, PREPROD and PROD environments using Bicep
 
 **PROMPT:**
-Please generate a Bicep template that creates:
+Please generate a Bicep template that creates infrastructure in Azure for a wweb app located at "https://github.com/boq-ghcp-demos/travel-agent-demo-app":
 - 3 resource groups:  <br/>
   rg-travel-agent-demo-dev   <br/>
   rg-travel-agent-demo-preprod   <br/>
@@ -15,8 +17,7 @@ Please generate a Bicep template that creates:
 - Check the GitHub Repo provided to find out the specific tech stack used for this app.
 - Pick East US region and S1 tier Web Application.
 
-**Note:** Make sure you have got enough quota in this region. Alternatively choose the region where you have required quota.
-  
+ 
 ## PART 2 - Creating a CI/CD pipeline in ADO with different stages of DEV, PREPROD and PROD
 
 ### Step 1 — Scaffold multi-stage pipeline
