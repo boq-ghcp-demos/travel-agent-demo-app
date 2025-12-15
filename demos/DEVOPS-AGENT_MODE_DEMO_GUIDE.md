@@ -61,6 +61,7 @@ Create an Azure DevOps multi-stage YAML pipeline for this Node.js app that:
 
 - Uses an Azure Resource Manager service connection (you choose and reference the name)
 - Deploys the web app located in "https://github.com/boq-ghcp-demos/travel-agent-demo-app" to Azure App Service all the three environments (DEV, PREPROD and PROD)
+- Clone the app repo to get the 
 - Publishes build output using the most reliable approach for multi-stage deployment and update the pipeline accordingly
 - Configures manual approval before the PROD stage via Azure DevOps Environments.
 - Checks the GitHub Repo provided to find out the specific tech stack used for this app and grab required files from this repo. <br/>
