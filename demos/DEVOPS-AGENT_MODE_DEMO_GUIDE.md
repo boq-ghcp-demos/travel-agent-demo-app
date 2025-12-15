@@ -1,10 +1,10 @@
 
 # DEVOPS - AGENT MODE DEMO(S)
 
-## BICEP
+We have sample web app in "https://github.com/boq-ghcp-demos/travel-agent-demo-app" and want to do a simple deployment to Azure App Service.
 
-I have a sample web app in "https://github.com/boq-ghcp-demos/travel-agent-demo-app". I want to do a simple deployment to Azure App Service. 
-
+## Provisioning the infrastructure using Bicep
+BICEP
 
 Please generate a Bicep template that creates:
 - A resource group 
