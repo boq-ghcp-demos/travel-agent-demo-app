@@ -71,6 +71,10 @@ Save the pipeline as `azure-pipelines.yml` at the repo root and show the FULL YA
 
 ### Step 3 - Create a ADO pipeline with YAML, upload `azure-pipelines.yml` and run the pipeline.
 
+- Pipelines → New pipeline → GitHub → pick repo → YAML → select azure-pipelines.yml.
+- Authorize GitHub and the ARM service connection when prompted (OAuth). [learn.microsoft.com] 
+- Create environments dev, preprod, prod; add an approval check to prod. [learn.microsoft.com]
+- Run: Build → Deploy DEV → Deploy PREPROD → Approve → Deploy PROD.
 <br/>
 
 ## PART 3 - Deploying into Kubernetes
