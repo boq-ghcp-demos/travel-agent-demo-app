@@ -79,4 +79,33 @@ Save the pipeline as `azure-pipelines.yml` at the repo root and show the FULL YA
 
 ## PART 3 - Deploying into Kubernetes
 
+This section adds a containerized path using AKS. Asking Copilot to:
 
+- Containerize the Node.js app (Dockerfile/.dockerignore).
+- Generate Kubernetes manifests (Deployment, Service, Ingress).
+- Scaffold Helm charts + per‑environment values (DEV/PREPROD/PROD).
+- Create/update the ADO pipeline to build/push image to ACR and deploy to AKS using Helm or the KubernetesManifest/Kubectl tasks.
+
+<br/>
+
+**Prerequisites for AKS path**
+
+- AKS clusters for dev, preprod, prod and an ACR (or one ACR with env‑specific repos/tags). 
+- Service connections in Azure DevOps:
+1. Docker/ACR service connection (for Docker@2 build/push).
+2. Kubernetes service connection (or ARM connection to AKS for private clusters/local accounts disabled).
+
+**PROMPT — provision AKS/ACR via Bicep**
+Create Bicep that provisions per environment:
+- AKS clusters: aks-travel-agent-dev, aks-travel-agent-preprod, aks-travel-agent-prod (system nodepool, Linux)
+- ACR: acrtravelagent<uniqueSuffix> with Basic SKU
+- AKS pull permission to ACR
+Expose outputs for cluster names, kube API server, and ACR loginServer.
+Keep East US, parameterise node counts and vmSize.
+
+**Note:** 
+AKS+Bicep quickstart and managedClusters schema for IaC for the clusters. [learn.microsoft.com], [learn.microsoft.com]
+
+
+
+  
