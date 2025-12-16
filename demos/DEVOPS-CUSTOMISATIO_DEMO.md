@@ -10,10 +10,11 @@ This guide explains how to deploy the sample app to **Azure App Service** and op
 2. [Provision App Service with Bicep](#provision-app-service-with-bicep)
 3. [Azure DevOps Multi-Stage Pipeline](#azure-devops-multi-stage-pipeline)
 4. [Kubernetes Deployment (AKS)](#kubernetes-deployment-aks)
-5. [Supporting Files for Automation](#supporting-files-for-automation)
-6. [Appendix: Embedded `.agent.md`](#appendix-embedded-agentmd)
-7. [Appendix: Embedded `.instructions.md`](#appendix-embedded-instructionsmd)
-8. [Appendix: Embedded `.prompt.md`](#appendix-embedded-promptmd)
+5. [Prompts for GitHub Copilot](#prompts-for-github-copilot)
+6. [Supporting Files for Automation](#supporting-files-for-automation)
+7. [Appendix: Embedded `.agent.md`](#appendix-embedded-agentmd)
+8. [Appendix: Embedded `.instructions.md`](#appendix-embedded-instructionsmd)
+9. [Appendix: Embedded `.prompt.md`](#appendix-embedded-promptmd)
 
 ---
 
@@ -159,6 +160,53 @@ version: 0.1.0
 
 ---
 
+## Prompts for GitHub Copilot
+
+### Overview
+Use these prompts with GitHub Copilot (VS Code) to scaffold infra and CI/CD for the travel agent app:
+- **Bicep** – App Service (East US, S1)
+- **Azure DevOps** – Multi-stage pipeline w/ approvals
+- **AKS** – Kubernetes manifests
+
+---
+
+### 1) Bicep – App Service (East US, S1)
+**One-shot prompt**  
+```
+Generate a Bicep file that deploys an App Service Plan (Linux) and a Web App in **eastus** using **S1** tier. Parameters: `webAppName`, `location='eastus'`. Set `httpsOnly=true`. Bind site to the plan via `serverFarmId`. Output the web app hostname. Use `Microsoft.Web/serverfarms` and `Microsoft.Web/sites` latest API versions.
+```
+**Refinement prompts**
+```
+- Add `reserved: true`, `kind: 'linux'` for the plan; validate `sku: { name: 'S1', tier: 'Standard' }`. [1](https://learn.microsoft.com/en-us/azure/app-service/provision-resource-bicep)
+- Add `siteConfig.linuxFxVersion` as a parameter and comment how to list runtimes (`az webapp list-runtimes`). [3](https://github.com/Azure-Samples/app-service-web-app-best-practice/blob/main/sample.bicep)
+```
+---
+
+### 2) Azure DevOps – Multi-Stage YAML Pipeline
+**One-shot prompt**  
+```
+Create `azure-pipelines.yml` with stages `Build`, `Dev`, `Staging` (approval gate), optional `Prod`. Use deployment jobs targeting environments named `Dev`, `Staging`, `Prod`. Deploy the artifact to the East US Web App using `AzureWebApp@1`. Variables: `azureSubscription`, `resourceGroup`, `webAppName`. Document that **approvals are set in Environments UI**. [4](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/create-multistage-pipeline?view=azure-devops)[5](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops)
+```
+
+**Refinement prompts**
+```
+- Build stage: install, build, test, publish artifact on `ubuntu-latest`. [6](https://mercuryworks.com/blog/creating-a-multi-stage-pipeline-in-azure-devops)
+- Dev/Staging/Prod stages: `strategy: runOnce` deployment jobs referencing environments. Add comments on Environments and Approvals. [5](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops)
+```
+---
+
+### 3) AKS – Kubernetes Deployment
+**One-shot prompt**
+```
+Generate `deployment.yaml` and `service.yaml` for a stateless web app: `Deployment` (3 replicas, image `${ACR_LOGIN_SERVER}/myapp:latest`, probes on `/healthz`), `Service` `LoadBalancer` on port 80. Labels/selectors consistent, rolling updates configured. Compatible with `kubectl apply -f`. [8](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+```
+
+**Refinement prompts**
+```
+- Add resource requests/limits and probe timings; explain how to update `${ACR_LOGIN_SERVER}` from `az acr list`. [7](https://learn.microsoft.com/en-us/azure/aks/tutorial-kubernetes-deploy-application)
+```
+---
+
 ## Supporting Files for Automation
 Create these three files in your repo (embedded versions are below if you prefer a single file):
 
@@ -176,10 +224,11 @@ Provides ready-to-use prompts for generating Bicep templates, pipeline YAML, Hel
 ## Appendix: Embedded `.agent.md`
 
 ```markdown
-# Azure DevOps Cloud Specialist Agent (.agent.md)
 
-## Purpose
-Provide specialized assistance for CI/CD on Azure using Azure DevOps (ADO), Bicep, App Service, and AKS/Helm. The agent helps plan, scaffold, and validate pipelines, IaC, and Kubernetes artifacts for the `travel-agent-demo-app`.
+---
+description: 'The agent is an Azure DevOps Cloud Specialist Agent and helps plan, scaffold, and validate pipelines, IaC, and Kubernetes artifacts for the `travel-agent-demo-app`.'
+tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'microsoft.docs.mcp/*', 'agent', 'bicep-(experimental)/*', 'azure-mcp/*', 'todo']
+---
 
 ## Scope & Capabilities
 - Design multi-stage ADO pipelines (Build → DevTest → PreProd → Prod) with **Environments** and **Approvals & Checks**.
@@ -204,6 +253,7 @@ Provide specialized assistance for CI/CD on Azure using Azure DevOps (ADO), Bice
 - ADO Multi-stage pipelines & approvals (Microsoft Learn).
 - App Service Bicep quickstart and samples (Microsoft Learn).
 - AKS pipeline guidance & Helm task reference (Microsoft Learn).
+---
 ```
 
 ---
@@ -218,7 +268,7 @@ These instructions define conventions and standards for infrastructure, pipeline
 ## General Standards
 - **Git**: Branch protection on `main`; PRs required; squash merges; semantic commit messages.
 - **Versioning**: Use semantic versions for artifacts and Helm charts; tag Docker images with `$(Build.BuildNumber)` and `git SHA`.
-- **Security**: Store secrets in Azure Key Vault; never hardcode secrets in code, YAML, or values files.
+- **Security**: this is a minimal demo app - do not make it complex. 
 
 ## BICEP Standards
 - **Structure**: `infra/` folder; root `main.bicep` calling parameterized modules.
@@ -256,32 +306,32 @@ These instructions define conventions and standards for infrastructure, pipeline
 ```markdown
 # Reusable Prompts (.prompt.md)
 
-## 1) Scaffold App Service Bicep (DevTest)
+## Scaffold App Service Bicep (DevTest)
 **Goal**: Generate a parameterized Bicep for App Service (Linux) with Node runtime and app settings.
 **Prompt**:
 > Create a `infra/main.bicep` that provisions a Linux App Service Plan and Web App using parameters: `nameSuffix`, `sku`, `linuxFxVersion`, `location`. Add app settings for `NEXT_PUBLIC_API_BASE_URL` and `NODE_ENV`, set `httpsOnly=true`. Output `webAppName` and `appServicePlanName`.
 
-## 2) Multi‑Stage ADO Pipeline
+## Multi‑Stage ADO Pipeline
 **Goal**: Build, archive, and deploy across DevTest → PreProd → Prod with ADO Environments and approvals.
 **Prompt**:
 > Create `.ado/azure-pipelines.yml` with stages `Build`, `DevTest`, `PreProd`, `Prod`. Use `NodeTool@0` (22.x), `ArchiveFiles@2`, `PublishBuildArtifacts@1`. Deploy with `AzureWebApp@1` to environment‑specific `appName` variables. Target ADO Environments and ensure approvals for PreProd/Prod.
 
-## 3) AKS + Helm Deployment Stage
+## AKS + Helm Deployment Stage
 **Goal**: Add an AKS deployment stage using Helm with image tag set to the build number.
 **Prompt**:
 > Extend the pipeline with stage `AKS_Deploy`: login to AKS using `Kubernetes@1` (ARM service connection), install Helm via `HelmInstaller@1`, and run `HelmDeploy@1 upgrade --install` on `charts/travelapp` with `--set image.tag=$(Build.BuildNumber)` and environment‑specific `values.*.yaml` overrides.
 
-## 4) Helm Chart Templates
+## Helm Chart Templates
 **Goal**: Create a minimal Helm chart for the Next.js app.
 **Prompt**:
 > Scaffold `charts/travelapp` with `Chart.yaml`, `values.yaml`, and templates for `deployment.yaml` and `service.yaml`. Use container port 3000, set readiness/liveness probes and `service.type=LoadBalancer`.
 
-## 5) Environment Settings via Pipeline
+## Environment Settings via Pipeline
 **Goal**: Manage App Service settings from YAML.
 **Prompt**:
 > Add an `AzureAppServiceSettings@0` step to set `NEXT_PUBLIC_API_BASE_URL` and any required connection strings using pipeline variables or Key Vault references.
 
-## 6) Promotion & Approval Policy
+## 6Promotion & Approval Policy
 **Goal**: Enforce gated releases.
 **Prompt**:
 > Configure ADO Environments (`DevTest`, `PreProd`, `Prod`) and set **Approvals & Checks** on `PreProd` and `Prod`. Ensure deployment jobs target these environments so approvals are enforced.
